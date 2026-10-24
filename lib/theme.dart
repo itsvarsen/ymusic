@@ -1,5 +1,5 @@
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 /// Warm, dark palette for ⅄music.
 class YColors {
@@ -20,6 +20,7 @@ class YTheme {
     final base = ThemeData(
       brightness: Brightness.dark,
       useMaterial3: true,
+      fontFamily: 'Manrope',
       scaffoldBackgroundColor: YColors.bg,
       colorScheme: const ColorScheme.dark(
         primary: YColors.amber,
@@ -31,7 +32,8 @@ class YTheme {
       ),
       splashFactory: InkSparkle.splashFactory,
     );
-    final text = GoogleFonts.manropeTextTheme(base.textTheme).apply(
+    final text = base.textTheme.apply(
+      fontFamily: 'Manrope',
       bodyColor: YColors.cream,
       displayColor: YColors.cream,
     );
@@ -48,7 +50,7 @@ class YTheme {
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: const Color(0xEE231A14),
-        contentTextStyle: GoogleFonts.manrope(color: YColors.cream, fontWeight: FontWeight.w600),
+        contentTextStyle: const TextStyle(fontFamily: 'Manrope', color: YColors.cream, fontWeight: FontWeight.w600),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: YColors.line),

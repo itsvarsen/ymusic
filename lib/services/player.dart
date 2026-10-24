@@ -11,7 +11,7 @@ import '../data/db.dart';
 import '../models/song.dart';
 import 'library.dart';
 
-enum RepeatMode { off, all, one }
+enum RepeatSetting { off, all, one }
 
 /// Playback + queue. The just_audio playlist is the single source of truth for
 /// the queue; each source's tag is a MediaItem whose id is the song id.
@@ -26,7 +26,7 @@ class PlayerController extends ChangeNotifier {
   PlayerController(this.library, this.db);
 
   bool shuffle = false;
-  RepeatMode repeat = RepeatMode.off;
+  RepeatSetting repeat = RepeatSetting.off;
   List<String> _unshuffled = []; // queue order before shuffling
   final _subs = <StreamSubscription>[];
   Timer? _saveTimer;
@@ -223,11 +223,11 @@ class PlayerController extends ChangeNotifier {
   }
 
   Future<void> cycleRepeat() async {
-    repeat = RepeatMode.values[(repeat.index + 1) % RepeatMode.values.length];
+    repeat = RepeatSetting.values[(repeat.index + 1) % RepeatSetting.values.length];
     await player.setLoopMode(switch (repeat) {
-      RepeatMode.off => LoopMode.off,
-      RepeatMode.all => LoopMode.all,
-      RepeatMode.one => LoopMode.one,
+      RepeatSetting.off => LoopMode.off,
+      RepeatSetting.all => LoopMode.all,
+      RepeatSetting.one => LoopMode.one,
     });
     db.setKv('repeat', repeat.name);
     notifyListeners();
@@ -399,11 +399,11 @@ class PlayerController extends ChangeNotifier {
     try {
       shuffle = (await db.getKv('shuffle')) == '1';
       final r = await db.getKv('repeat');
-      repeat = RepeatMode.values.firstWhere((e) => e.name == r, orElse: () => RepeatMode.off);
+      repeat = RepeatSetting.values.firstWhere((e) => e.name == r, orElse: () => RepeatSetting.off);
       await player.setLoopMode(switch (repeat) {
-        RepeatMode.off => LoopMode.off,
-        RepeatMode.all => LoopMode.all,
-        RepeatMode.one => LoopMode.one,
+        RepeatSetting.off => LoopMode.off,
+        RepeatSetting.all => LoopMode.all,
+        RepeatSetting.one => LoopMode.one,
       });
       final raw = await db.getKv('player_state');
       if (raw == null) return;

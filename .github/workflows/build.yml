@@ -10,7 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      KS_PASS: ymusic-varsen-2026
+      # Optional: add these repo secrets for a stable signing key across builds.
+      # Without them each build is signed with a fresh throwaway key (never stored).
+      KEYSTORE_B64: ${{ secrets.YMUSIC_KEYSTORE_B64 }}
+      KEYSTORE_PASS: ${{ secrets.YMUSIC_KEYSTORE_PASS }}
     steps:
       - uses: actions/checkout@v4
 
@@ -41,19 +44,26 @@ jobs:
 
       - name: Signing keystore
         run: |
-          mkdir -p signing
-          if [ ! -f signing/ymusic-release.jks ]; then
-            keytool -genkeypair -v -keystore signing/ymusic-release.jks -storetype PKCS12 \
+          mkdir -p "$RUNNER_TEMP/signing"
+          KS="$RUNNER_TEMP/signing/ymusic-release.jks"
+          if [ -n "$KEYSTORE_B64" ] && [ -n "$KEYSTORE_PASS" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$KS"
+            PASS="$KEYSTORE_PASS"
+            echo "Using keystore from repository secrets"
+          else
+            PASS=$(openssl rand -hex 24)
+            echo "::add-mask::$PASS"
+            keytool -genkeypair -keystore "$KS" -storetype PKCS12 \
               -alias ymusic -keyalg RSA -keysize 2048 -validity 10000 \
-              -storepass "$KS_PASS" -keypass "$KS_PASS" \
+              -storepass "$PASS" -keypass "$PASS" \
               -dname "CN=Varsen, OU=ymusic, O=Varsen, L=Chiva, C=ES"
-            echo "KEYSTORE_GENERATED=1" >> "$GITHUB_ENV"
+            echo "Generated a throwaway release keystore for this build"
           fi
           {
-            echo "storePassword=$KS_PASS"
-            echo "keyPassword=$KS_PASS"
+            echo "storePassword=$PASS"
+            echo "keyPassword=$PASS"
             echo "keyAlias=ymusic"
-            echo "storeFile=$GITHUB_WORKSPACE/signing/ymusic-release.jks"
+            echo "storeFile=$KS"
           } > android/key.properties
 
       - name: Analyze (informational)
@@ -74,10 +84,3 @@ jobs:
           name: ymusic-apk
           path: ymusic.apk
           if-no-files-found: error
-
-      - name: Upload generated keystore (first run only)
-        if: env.KEYSTORE_GENERATED == '1'
-        uses: actions/upload-artifact@v4
-        with:
-          name: signing-keystore
-          path: signing/ymusic-release.jks

@@ -336,7 +336,7 @@ class _Controls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final repeatIcon = player.repeat == RepeatMode.one ? Icons.repeat_one_rounded : Icons.repeat_rounded;
+    final repeatIcon = player.repeat == RepeatSetting.one ? Icons.repeat_one_rounded : Icons.repeat_rounded;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -394,7 +394,7 @@ class _Controls extends StatelessWidget {
         ),
         _ToggleIcon(
           icon: repeatIcon,
-          active: player.repeat != RepeatMode.off,
+          active: player.repeat != RepeatSetting.off,
           accent: accent,
           onTap: player.cycleRepeat,
         ),

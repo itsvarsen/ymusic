@@ -51,7 +51,7 @@ class QueueScreen extends StatelessWidget {
                   children: [
                     Text(
                       '${queue.length} songs · ${player.shuffle ? 'shuffled' : 'in order'}'
-                      '${player.repeat == RepeatMode.off ? '' : player.repeat == RepeatMode.one ? ' · repeat one' : ' · repeat all'}',
+                      '${player.repeat == RepeatSetting.off ? '' : player.repeat == RepeatSetting.one ? ' · repeat one' : ' · repeat all'}',
                       style: const TextStyle(color: YColors.muted, fontSize: 13),
                     ),
                   ],
