@@ -19,7 +19,7 @@ dependencies:
   path: ^1.9.0
   crypto: ^3.0.6
   provider: ^6.1.5
-  permission_handler: ">=11.4.0 <14.0.0"
+  permission_handler: ^12.0.1  # 13.x needs compileSdk 37 (newer than current Flutter stable AGP)
 
 dev_dependencies:
   flutter_test:
